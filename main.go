@@ -1,10 +1,12 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
+	"strings"
+
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 func main() {
@@ -12,28 +14,55 @@ func main() {
 }
 
 func run() int {
-	wd, _ := os.Getwd()
-	gd, err := findGitDir(wd)
+	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
-	fmt.Println(gd)
 
-	return 0
-}
+	r, err := git.PlainOpenWithOptions(wd, &git.PlainOpenOptions{
+		DetectDotGit: true,
+	})
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
 
-func findGitDir(path string) (string, error) {
-	for {
-		gitDirPath := filepath.Join(path, ".git")
-		_, err := os.Stat(gitDirPath)
-		if err != nil {
-			if path == "/" {
-				return "", errors.New("fatal: not a git repository (or any of the parent directories): .git")
-			}
-			path = filepath.Dir(path)
+	h, err := r.Reference(plumbing.HEAD, false)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+
+	currentBranch := strings.TrimPrefix(h.Target().String(), "refs/heads/")
+	fmt.Println("currentBranch:", currentBranch)
+
+	list, err := r.Remotes()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+
+	var gitURL string
+	for _, r := range list {
+		if r.Config().Name != "origin" {
 			continue
 		}
-		return gitDirPath, nil
+		gitURL = r.Config().URLs[0]
 	}
+	if gitURL == "" {
+		fmt.Fprintln(os.Stderr, "not set url")
+	}
+
+	openURL := getOpenURL(gitURL, currentBranch)
+	_ = openURL
+	/*
+		err = open.Run(openURL)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+	*/
+
+	return 0
 }
