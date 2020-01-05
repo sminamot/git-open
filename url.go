@@ -7,25 +7,22 @@ import (
 
 const defaultProtocol = "https"
 
-func getOpenURL(gitURL, currentBranch string) (openURL string) {
+func getOpenURL(gitURL, currentBranch string) string {
 	s := strings.Split(gitURL, `://`)
 	if len(s) < 2 {
-		return
+		return ""
 	}
 
 	gitProtocol := s[0]
-	fmt.Println("gitProtocol:", gitProtocol)
 
 	uri := strings.Join(s[1:], "")
 	s = strings.Split(uri, "@")
 	if len(s) > 1 {
 		uri = strings.Join(s[1:], "")
 	}
-	fmt.Println("uri:", uri)
 
 	s = strings.SplitN(uri, "/", 2)
 	domain := s[0]
-	fmt.Println("domain:", domain)
 
 	var urlPath string
 	if len(s) > 1 {
@@ -33,14 +30,13 @@ func getOpenURL(gitURL, currentBranch string) (openURL string) {
 	}
 	urlPath = strings.Trim(urlPath, "/")
 	urlPath = strings.TrimSuffix(urlPath, ".git")
-	fmt.Println("urlPath:", urlPath)
 
 	protocol := defaultProtocol
 	if gitProtocol == "http" {
 		protocol = "http"
 	}
 
-	openURL = fmt.Sprintf("%s://%s/%s", protocol, domain, urlPath)
+	openURL := fmt.Sprintf("%s://%s/%s", protocol, domain, urlPath)
 	if currentBranch != "master" {
 		// escape "%" and "#"
 		currentBranch = strings.ReplaceAll(currentBranch, "%", "%25")
@@ -49,5 +45,5 @@ func getOpenURL(gitURL, currentBranch string) (openURL string) {
 		openURL += branchRef
 	}
 
-	return
+	return openURL
 }

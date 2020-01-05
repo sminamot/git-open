@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/skratchdot/open-golang/open"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
@@ -35,7 +36,6 @@ func run() int {
 	}
 
 	currentBranch := strings.TrimPrefix(h.Target().String(), "refs/heads/")
-	fmt.Println("currentBranch:", currentBranch)
 
 	list, err := r.Remotes()
 	if err != nil {
@@ -55,14 +55,11 @@ func run() int {
 	}
 
 	openURL := getOpenURL(gitURL, currentBranch)
-	_ = openURL
-	/*
-		err = open.Run(openURL)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return 1
-		}
-	*/
+	err = open.Run(openURL)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
 
 	return 0
 }
