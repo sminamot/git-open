@@ -54,7 +54,10 @@ func run() int {
 		fmt.Fprintln(os.Stderr, "not set url")
 	}
 
-	openURL := getOpenURL(gitURL, currentBranch)
+	// openUrl is format of "xxx://xxx/xxx"
+	e := getOpenURLElements(gitURL, currentBranch)
+	domain := resolveDomain(e.domain)
+	openURL := fmt.Sprintf("%s://%s/%s", e.protocol, domain, e.urlPath)
 	err = open.Run(openURL)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
