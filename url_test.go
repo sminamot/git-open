@@ -85,6 +85,42 @@ func TestGetOpenURLElements(t *testing.T) {
 				urlPath:  "sminamot/git-open/tree/develop",
 			},
 		},
+		{
+			gitURL:        "github.com:sminamot/git-open.git",
+			currentBranch: "master",
+			want: &openURLElements{
+				protocol: "https",
+				domain:   "github.com",
+				urlPath:  "sminamot/git-open",
+			},
+		},
+		{
+			gitURL:        "github.com:sminamot/git-open.git",
+			currentBranch: "develop",
+			want: &openURLElements{
+				protocol: "https",
+				domain:   "github.com",
+				urlPath:  "sminamot/git-open/tree/develop",
+			},
+		},
+		{
+			gitURL:        "git@github.com:sminamot/git-open.git",
+			currentBranch: "master",
+			want: &openURLElements{
+				protocol: "https",
+				domain:   "github.com",
+				urlPath:  "sminamot/git-open",
+			},
+		},
+		{
+			gitURL:        "git@github.com:sminamot/git-open.git",
+			currentBranch: "develop",
+			want: &openURLElements{
+				protocol: "https",
+				domain:   "github.com",
+				urlPath:  "sminamot/git-open/tree/develop",
+			},
+		},
 	}
 
 	for _, tt := range tests {
