@@ -27,5 +27,6 @@ changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
+    - '^:speech_balloon:'
+    - '^:green_heart:'
+    - 'README'
