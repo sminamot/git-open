@@ -1,7 +1,31 @@
 #compdef git-open
 
+_remote_name() {
+    if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        _values \
+            'remote' \
+            $(git remote)
+    fi
+}
+
+_branch_name() {
+    if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        _values \
+            'branch' \
+            $(git branch | awk -F ' +' '{print $2}')
+    fi
+}
+
 _git-open() {
-if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-    compadd $(git remote)
-fi
+_arguments \
+    '1: :->remote' \
+    '2: :->branch'
+    case $state in
+        remote)
+            _remote_name
+            ;;
+        branch)
+            _branch_name
+            ;;
+    esac
 }
